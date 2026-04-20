@@ -5,113 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>GAVOILLE - LOOK BOOK</title>
+    <title>GAVOILLE - LOOK BOOK FINAL</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --red: #E20613; --black: #1A1A18; --white: #FFFFFF; }
-        
+        :root { --red: #E20613; --black: #1A1A18; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
         body { 
             margin: 0; background: var(--black); color: white; 
             font-family: 'Montserrat', sans-serif; 
-            height: 100vh; height: -webkit-fill-available;
-            display: flex; flex-direction: column; overflow: hidden; 
+            height: 100vh; display: flex; flex-direction: column; overflow: hidden; 
             position: fixed; width: 100%;
         }
-        
-        header { 
-            padding-top: env(safe-area-inset-top);
-            background: white; text-align: center; 
-            border-bottom: 3px solid var(--red); flex-shrink: 0; 
-        }
-        
+        header { padding-top: env(safe-area-inset-top); background: white; text-align: center; border-bottom: 3px solid var(--red); flex-shrink: 0; }
         .gavoille-logo-square { 
             display: inline-flex; background: var(--red); color: white; 
-            width: 80px; height: 80px; border: 2px solid #000; margin: 10px 0;
+            width: 70px; height: 70px; border: 2px solid #000; margin: 10px 0;
             flex-direction: column; justify-content: center; align-items: center;
         }
-        .logo-text-main { font-size: 0.8rem; font-weight: 900; line-height: 1; }
-        .logo-text-sub { font-size: 0.55rem; padding-left: 10px; font-weight: 400; }
+        .logo-text-main { font-size: 0.7rem; font-weight: 900; line-height: 1; }
+        .logo-text-sub { font-size: 0.5rem; padding-left: 8px; }
 
-        .main-container { 
-            flex: 1; display: flex; flex-direction: row; 
-            padding: 15px; gap: 15px; overflow: hidden;
-            /* Espace pour les contrôles flottants */
-            margin-bottom: calc(110px + env(safe-area-inset-bottom));
-        }
-
+        .main-container { flex: 1; display: flex; flex-direction: row; padding: 15px; gap: 15px; overflow: hidden; margin-bottom: calc(100px + env(safe-area-inset-bottom)); }
         @media (max-width: 768px) {
             .main-container { flex-direction: column; }
-            .mirror-view { flex: 2 !important; }
-            .side-gallery { 
-                flex: 1 !important; 
-                grid-template-columns: repeat(4, 1fr) !important; 
-                grid-template-rows: 1fr !important; 
-                gap: 5px;
-            }
+            .mirror-view { flex: 1.8 !important; }
+            .side-gallery { flex: 1 !important; grid-template-columns: repeat(4, 1fr) !important; grid-template-rows: 1fr !important; gap: 5px; }
         }
-
         .mirror-view { flex: 2.5; position: relative; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #333; }
-        #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); filter: brightness(1.05) contrast(1.05); }
+        #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
 
         .side-gallery { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; }
-        
-        /* Conteneur pour vignettes sans déformation */
-        .slot { 
-            background: #222; border-radius: 12px; border: 2px solid transparent; 
-            overflow: hidden; position: relative; 
-            /* Ratio 3:4 forcé pour vignettes */
-            aspect-ratio: 3/4; 
-            transition: 0.3s; 
-        }
-        
-        /* Image dans vignette : Crop automatique */
-        .slot img { 
-            width: 100%; height: 100%; 
-            object-fit: cover; /* Recadre sans écraser */
-            object-position: center;
-        }
-        
-        .slot.active { border-color: var(--red); box-shadow: 0 0 15px rgba(226, 6, 19, 0.4); transform: scale(1.02); }
+        .slot { background: #222; border-radius: 12px; border: 2px solid transparent; overflow: hidden; aspect-ratio: 3/4; transition: 0.3s; }
+        .slot img { width: 100%; height: 100%; object-fit: cover; }
+        .slot.active { border-color: var(--red); box-shadow: 0 0 15px rgba(226, 6, 19, 0.5); }
 
-        /* BARRE DE CONTRÔLES SÉCURISÉE */
         .floating-controls { 
-            position: fixed; 
-            bottom: calc(25px + env(safe-area-inset-bottom));
-            left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 450px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 15px 25px; border-radius: 60px;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            z-index: 9999;
-            backdrop-filter: blur(10px);
+            position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 450px; background: rgba(255, 255, 255, 0.95); padding: 15px; border-radius: 50px;
+            display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 999;
         }
-
-        .shutter { 
-            width: 75px; height: 75px; background: var(--red); 
-            border-radius: 50%; border: 5px solid white; cursor: pointer; 
-            box-shadow: 0 0 0 3px var(--red);
-        }
-        .shutter:active { transform: scale(0.9); }
-        
-        .btn-ui { background: var(--black); color: white; border: none; padding: 14px 24px; border-radius: 30px; font-weight: 900; font-size: 0.8rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-reset { background: transparent; color: #999; text-decoration: underline; font-weight: 400; text-transform: none; }
-
+        .shutter { width: 70px; height: 70px; background: var(--red); border-radius: 50%; border: 5px solid white; cursor: pointer; box-shadow: 0 0 0 2px var(--red); }
+        .btn-ui { background: var(--black); color: white; border: none; padding: 12px 20px; border-radius: 30px; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
         #flash { position: absolute; top:0; left:0; width:100%; height:100%; background:white; opacity:0; pointer-events:none; z-index: 10; }
-        
-        /* Canvas caché pour l'export, doit garder le ratio Story */
         #exportCanvas { display: none; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="gavoille-logo-square">
-        <div class="logo-text-main">GAVOILLE</div>
-        <div class="logo-text-sub">Opticiens</div>
-    </div>
+    <div class="gavoille-logo-square"><div class="logo-text-main">GAVOILLE</div><div class="logo-text-sub">Opticiens</div></div>
 </header>
 
 <div class="main-container">
@@ -128,9 +70,9 @@
 </div>
 
 <div class="floating-controls">
-    <button class="btn-ui btn-reset" onclick="location.reload()">Reset</button>
+    <button class="btn-ui" style="background:none; color:#666; text-decoration:underline;" onclick="location.reload()">Reset</button>
     <button class="shutter" onclick="capture()"></button>
-    <button class="btn-ui" onclick="shareViralLookbook()">Partager</button>
+    <button class="btn-ui" onclick="shareFinal()">PARTAGER</button>
 </div>
 
 <canvas id="exportCanvas"></canvas>
@@ -138,144 +80,93 @@
 <script>
     const video = document.getElementById('video');
     let currentSlot = 1;
-    let imagesBlob = [null, null, null, null]; // Stocke les Blobs d'images pour l'export
+    let imagesData = [null, null, null, null];
 
-    navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: "user", width: { ideal: 1920 }, height: { ideal: 1080 } } 
-    }).then(s => video.srcObject = s).catch(e => alert("Caméra non accessible."));
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: 1280, height: 720 } }).then(s => video.srcObject = s);
 
-    // Capture : Recadre la photo pour vignette sans déformer
     function capture() {
         const flash = document.getElementById('flash');
-        flash.style.opacity = 1; setTimeout(() => flash.style.opacity = 0, 100);
+        flash.style.opacity = 1; setTimeout(() => flash.opacity = 0, 100);
 
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         
-        // Ratio cible pour vignette : 3/4
-        const targetW = 768; 
-        const targetH = 1024;
+        // On définit un ratio 3:4 propre pour éviter l'effet "écrasé"
+        const targetW = 600;
+        const targetH = 800;
         canvas.width = targetW;
         canvas.height = targetH;
-        
-        // Calcul du recadrage (Crop) au centre
-        const videoW = video.videoWidth;
-        const videoH = video.videoHeight;
-        const videoRatio = videoW / videoH;
+
+        // Calcul du recadrage central (Crop)
+        const vW = video.videoWidth;
+        const vH = video.videoHeight;
+        const videoRatio = vW / vH;
         const targetRatio = targetW / targetH;
-        
-        let sourceX, sourceY, sourceW, sourceH;
-        
+
+        let sX, sY, sW, sH;
         if (videoRatio > targetRatio) {
-            // Vidéo trop large (ex 16:9), on coupe les côtés
-            sourceH = videoH;
-            sourceW = videoH * targetRatio;
-            sourceX = (videoW - sourceW) / 2;
-            sourceY = 0;
+            sH = vH; sW = vH * targetRatio;
+            sX = (vW - sW) / 2; sY = 0;
         } else {
-            // Vidéo trop haute, on coupe le haut/bas
-            sourceW = videoW;
-            sourceH = videoW / targetRatio;
-            sourceX = 0;
-            sourceY = (videoH - sourceH) / 2;
+            sW = vW; sH = vW / targetRatio;
+            sX = 0; sY = (vH - sH) / 2;
         }
 
-        // Dessin recadré avec effet miroir
-        ctx.filter = 'brightness(1.04) contrast(1.04)';
-        ctx.translate(canvas.width, 0); ctx.scale(-1, 1);
-        ctx.drawImage(video, sourceX, sourceY, sourceW, sourceH, 0, 0, targetW, targetH);
+        ctx.translate(targetW, 0); ctx.scale(-1, 1); // Effet miroir
+        ctx.drawImage(video, sX, sY, sW, sH, 0, 0, targetW, targetH);
         
-        // Stockage du Blob pour l'export final
-        canvas.toBlob((blob) => {
-            imagesBlob[currentSlot-1] = blob;
-            const url = URL.createObjectURL(blob);
-            document.getElementById('s'+currentSlot).innerHTML = `<img src="${url}">`;
-            
-            // Update slots
-            document.querySelectorAll('.slot').forEach(s => s.classList.remove('active'));
-            currentSlot = (currentSlot % 4) + 1;
-            document.getElementById('s'+currentSlot).classList.add('active');
-        }, 'image/jpeg', 0.9);
+        const data = canvas.toDataURL('image/jpeg', 0.9);
+        imagesData[currentSlot-1] = data;
+        
+        document.getElementById('s'+currentSlot).innerHTML = `<img src="${data}">`;
+        document.querySelectorAll('.slot').forEach(s => s.classList.remove('active'));
+        currentSlot = (currentSlot % 4) + 1;
+        document.getElementById('s'+currentSlot).classList.add('active');
     }
 
-    // Export Final : Monte le Lookbook Story avec images recadrées
-    async function shareViralLookbook() {
-        if(!imagesBlob[0]) { alert("Prenez au moins une photo !"); return; }
+    async function shareFinal() {
+        if(!imagesData[0]) return;
         const canvas = document.getElementById('exportCanvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = 1080; canvas.height = 1920; // Format Story
+        canvas.width = 1080; canvas.height = 1920;
 
-        // Fond Magazine
-        let grad = ctx.createLinearGradient(0, 0, 0, 1920);
-        grad.addColorStop(0, "#FFFFFF"); grad.addColorStop(1, "#F0F0F0");
-        ctx.fillStyle = grad; ctx.fillRect(0,0,1080,1920);
+        // Fond Blanc Premium
+        ctx.fillStyle = "white"; ctx.fillRect(0,0,1080,1920);
 
-        // Logo Carré Officiel
-        const logoSize = 220;
-        const logoX = (1080 - logoSize) / 2;
-        ctx.fillStyle = "#E20613"; ctx.fillRect(logoX, 100, logoSize, logoSize);
-        ctx.strokeStyle = "black"; ctx.lineWidth = 4; ctx.strokeRect(logoX - 2, 98, logoSize + 4, logoSize + 4);
+        // Logo Gavoille
+        ctx.fillStyle = "#E20613"; ctx.fillRect(430, 80, 220, 220);
+        ctx.strokeStyle = "black"; ctx.lineWidth = 4; ctx.strokeRect(428, 78, 224, 224);
         ctx.fillStyle = "white"; ctx.textAlign = "center";
-        ctx.font = "bold 40px Arial"; ctx.fillText("GAVOILLE", 540, 195);
-        ctx.font = "28px Arial"; ctx.fillText("Opticiens", 580, 235);
-        
-        // Titre Lookbook
-        ctx.fillStyle = "#1A1A18"; ctx.font = "900 70px Montserrat";
-        ctx.fillText("LOOK BOOK", 540, 420);
-        ctx.font = "italic 40px Georgia";
-        ctx.fillText("Quelle paire pour ma nouvelle tête ?", 540, 485);
+        ctx.font = "bold 40px Arial"; ctx.fillText("GAVOILLE", 540, 185);
+        ctx.font = "28px Arial"; ctx.fillText("Opticiens", 580, 225);
 
-        // Grille photos (ratio 3:4 maintenu)
-        const w = 485; const h = 647;
-        const pos = [[35, 550], [560, 550], [35, 1227], [560, 1227]];
+        // Textes
+        ctx.fillStyle = "#1A1A18"; ctx.font = "900 80px Montserrat"; ctx.fillText("LOOK BOOK", 540, 420);
+        ctx.font = "italic 40px Georgia"; ctx.fillText("Quelle paire pour ma nouvelle tête ?", 540, 490);
+
+        // Grille photos (ratio respecté)
+        const w = 480; const h = 640;
+        const pos = [[40, 560], [560, 560], [40, 1220], [560, 1220]];
 
         for(let i=0; i<4; i++) {
-            if(imagesBlob[i]) {
-                const img = await new Promise(res => { 
-                    const o = new Image(); 
-                    o.onload = () => res(o); 
-                    o.src = URL.createObjectURL(imagesBlob[i]); 
-                });
-                
-                // Ombre style Magazine
-                ctx.shadowColor = "rgba(0,0,0,0.18)"; ctx.shadowBlur = 25; ctx.shadowOffsetY = 10;
+            if(imagesData[i]) {
+                const img = await new Promise(r => { const o = new Image(); o.onload = () => r(o); o.src = imagesData[i]; });
                 ctx.drawImage(img, pos[i][0], pos[i][1], w, h);
-                ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
-
-                // Bordure Rouge
-                ctx.strokeStyle = "#E20613"; ctx.lineWidth = 8;
-                ctx.strokeRect(pos[i][0], pos[i][1], w, h);
-
-                // Pastille interactive pour le vote
-                ctx.fillStyle = "white"; ctx.beginPath();
-                ctx.arc(pos[i][0] + w - 55, pos[i][1] + 55, 45, 0, Math.PI * 2); ctx.fill();
-                ctx.strokeStyle = "#E20613"; ctx.lineWidth = 4; ctx.stroke();
-                ctx.fillStyle = "#E20613"; ctx.font = "bold 50px Arial";
-                ctx.fillText(i+1, pos[i][0] + w - 55, pos[i][1] + 72);
+                ctx.strokeStyle = "#E20613"; ctx.lineWidth = 8; ctx.strokeRect(pos[i][0], pos[i][1], w, h);
+                
+                // Pastille de vote
+                ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(pos[i][0]+w-50, pos[i][1]+50, 45, 0, Math.PI*2); ctx.fill();
+                ctx.strokeStyle = "#E20613"; ctx.lineWidth = 3; ctx.stroke();
+                ctx.fillStyle = "#E20613"; ctx.font = "bold 50px Arial"; ctx.fillText(i+1, pos[i][0]+w-50, pos[i][1]+68);
             }
         }
 
-        // Appel à l'action
-        ctx.fillStyle = "#E20613"; ctx.font = "bold 50px Montserrat";
-        ctx.fillText("VOTE EN RÉPONDANT ICI ! 👇", 540, 1800);
+        ctx.fillStyle = "#E20613"; ctx.font = "bold 50px Montserrat"; ctx.fillText("VOTE EN RÉPONDANT ICI ! 👇", 540, 1820);
 
-        // Footer
-        ctx.fillStyle = "#1A1A18"; ctx.fillRect(0, 1845, 1080, 75);
-        ctx.fillStyle = "white"; ctx.font = "bold 30px Montserrat";
-        ctx.fillText("PARTEZ AVEC LE STYLE @GAVOILLE_OPTICIENS_JASSANS", 540, 1895);
-
-        // Exportation
-        canvas.toBlob(async (blob) => {
-            const file = new File([blob], "mon-look-gavoille.jpg", { type: "image/jpeg" });
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                await navigator.share({ files: [file] });
-            } else {
-                // Fallback direct download
-                const link = document.createElement('a');
-                link.download = 'mon-look-gavoille.jpg';
-                link.href = canvas.toDataURL("image/jpeg", 0.95);
-                link.click();
-            }
+        canvas.toBlob(async (b) => {
+            const f = new File([b], "lookbook.jpg", {type:"image/jpeg"});
+            if(navigator.canShare && navigator.canShare({files:[f]})) await navigator.share({files:[f]});
+            else window.open(canvas.toDataURL());
         }, 'image/jpeg', 0.95);
     }
 </script>
