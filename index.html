@@ -2,48 +2,81 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>GAVOILLE MIROIR</title>
     <style>
-        :root { --red: #E20613; --black: #1A1A18; --grey: #F8F8F8; }
+        :root { --red: #E20613; --black: #1A1A18; --white: #FFFFFF; }
         
-        body { margin: 0; background: var(--black); color: white; font-family: 'Montserrat', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        
-        header { padding: 15px; background: white; text-align: center; border-bottom: 3px solid var(--red); flex-shrink: 0; }
-        
-        /* Logo Carré Fidèle à image_2.png */
-        .gavoille-logo-square { 
-            display: inline-block; background: var(--red); color: white; 
-            width: 100px; height: 100px; /* Carré parfait */
-            border: 2px solid #000; outline: 1px solid #ddd;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        /* Gestion de l'affichage plein écran pour éviter les menus mobiles */
+        body { 
+            margin: 0; background: var(--black); color: white; 
+            font-family: 'Montserrat', sans-serif; 
+            height: 100vh; height: -webkit-fill-available;
+            display: flex; flex-direction: column; overflow: hidden; 
         }
-        .logo-text-main { font-size: 1rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: -5px; }
-        .logo-text-sub { font-size: 0.7rem; font-weight: 400; padding-left: 15px; }
+        
+        header { 
+            padding: 10px; background: white; text-align: center; 
+            border-bottom: 3px solid var(--red); flex-shrink: 0; 
+            z-index: 10;
+        }
+        
+        .gavoille-logo-square { 
+            display: inline-flex; background: var(--red); color: white; 
+            width: 80px; height: 80px; border: 2px solid #000;
+            flex-direction: column; justify-content: center; align-items: center;
+        }
+        .logo-text-main { font-size: 0.8rem; font-weight: 800; }
+        .logo-text-sub { font-size: 0.6rem; padding-left: 10px; }
 
-        .main-container { flex: 1; display: flex; flex-direction: row; padding: 15px; gap: 15px; overflow: hidden; }
+        .main-container { 
+            flex: 1; display: flex; flex-direction: row; 
+            padding: 10px; gap: 10px; overflow: hidden;
+            padding-bottom: 100px; /* Espace pour les boutons flottants */
+        }
 
         @media (max-width: 768px) {
             .main-container { flex-direction: column; }
-            .mirror-view { flex: 2 !important; }
-            .side-gallery { flex: 0.7 !important; grid-template-columns: repeat(4, 1fr) !important; grid-template-rows: 1fr !important; }
+            .side-gallery { 
+                flex: 0.5 !important; 
+                grid-template-columns: repeat(4, 1fr) !important; 
+                grid-template-rows: 1fr !important; 
+            }
         }
 
-        .mirror-view { flex: 2.5; position: relative; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #444; }
-        #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); filter: brightness(1.05) contrast(1.1); }
+        .mirror-view { flex: 2; position: relative; background: #000; border-radius: 15px; overflow: hidden; border: 1px solid #444; }
+        #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
 
-        .side-gallery { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; }
-        .slot { background: #222; border-radius: 12px; border: 2px solid transparent; overflow: hidden; position: relative; aspect-ratio: 3/4; }
+        .side-gallery { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px; }
+        .slot { background: #222; border-radius: 10px; border: 2px solid transparent; overflow: hidden; position: relative; aspect-ratio: 3/4; }
         .slot img { width: 100%; height: 100%; object-fit: cover; }
-        .slot.active { border-color: var(--red); box-shadow: 0 0 15px rgba(226, 6, 19, 0.5); }
+        .slot.active { border-color: var(--red); }
 
-        .controls { padding: 20px; display: flex; justify-content: center; align-items: center; gap: 30px; background: white; flex-shrink: 0; }
-        .shutter { width: 75px; height: 75px; background: var(--red); border-radius: 50%; border: 6px solid #f8d0d2; cursor: pointer; }
-        .share-btn { background: var(--black); color: white; border: none; padding: 15px 30px; border-radius: 50px; font-weight: bold; font-size: 0.9rem; cursor: pointer; }
+        /* BARRE DE CONTRÔLES FLOTTANTE (Solution pour Android/iPhone) */
+        .floating-controls { 
+            position: fixed; 
+            bottom: 25px; /* Décollé du bas pour éviter les menus */
+            left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px; border-radius: 50px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .shutter { 
+            width: 65px; height: 65px; background: var(--red); 
+            border-radius: 50%; border: 4px solid white; cursor: pointer; 
+            box-shadow: 0 0 0 2px var(--red);
+        }
         
-        #flash { position: absolute; top:0; left:0; width:100%; height:100%; background:white; opacity:0; pointer-events:none; }
+        .btn-ui { background: var(--black); color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; cursor: pointer; }
+        .btn-reset { background: transparent; color: #666; font-size: 0.7rem; text-decoration: underline; }
+
+        #flash { position: absolute; top:0; left:0; width:100%; height:100%; background:white; opacity:0; pointer-events:none; z-index: 5; }
     </style>
 </head>
 <body>
@@ -53,7 +86,7 @@
         <div class="logo-text-main">GAVOILLE</div>
         <div class="logo-text-sub">Opticiens</div>
     </div>
-    <div style="color:#666; font-size:0.6rem; letter-spacing:4px; text-transform:uppercase; margin-top:10px;">Jassans Riottier</div>
+    <div style="color:#666; font-size:0.5rem; letter-spacing:3px; text-transform:uppercase; margin-top:5px;">Jassans Riottier</div>
 </header>
 
 <div class="main-container">
@@ -69,10 +102,10 @@
     </div>
 </div>
 
-<div class="controls">
-    <button onclick="location.reload()" style="background:none; border:none; color:#999; text-decoration:underline; font-size:0.8rem;">Réinitialiser</button>
+<div class="floating-controls">
+    <button class="btn-ui btn-reset" onclick="location.reload()">Reset</button>
     <button class="shutter" onclick="capture()"></button>
-    <button class="share-btn" onclick="shareViralWithPoll()">🚀 PARTAGER LA STORY</button>
+    <button class="btn-ui" onclick="shareViralWithPoll()">PARTAGER</button>
 </div>
 
 <canvas id="exportCanvas" style="display:none;"></canvas>
@@ -82,7 +115,9 @@
     let currentSlot = 1;
     let images = [null, null, null, null];
 
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }).then(s => video.srcObject = s);
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+        .then(s => video.srcObject = s)
+        .catch(err => alert("Erreur caméra : " + err));
 
     function capture() {
         const flash = document.getElementById('flash');
@@ -107,42 +142,27 @@
     }
 
     async function shareViralWithPoll() {
-        if(!images[0]) { alert("Prenez au moins une photo !"); return; }
-        
+        if(!images[0]) return;
         const canvas = document.getElementById('exportCanvas');
         const ctx = canvas.getContext('2d');
         canvas.width = 1080; canvas.height = 1920;
-
         ctx.fillStyle = "white"; ctx.fillRect(0,0,1080,1920);
 
-        // LOGO CARRÉ SUR L'EXPORT
+        // Logo Carré sur l'image finale
         const logoSize = 250;
-        const logoX = (1080 - logoSize) / 2;
-        ctx.fillStyle = "#E20613"; 
-        ctx.fillRect(logoX, 80, logoSize, logoSize); // Carré Rouge
-        ctx.strokeStyle = "black"; ctx.lineWidth = 4;
-        ctx.strokeRect(logoX - 2, 78, logoSize + 4, logoSize + 4); // Cadre noir
-        
+        ctx.fillStyle = "#E20613"; ctx.fillRect(415, 80, logoSize, logoSize);
+        ctx.strokeStyle = "black"; ctx.lineWidth = 4; ctx.strokeRect(413, 78, logoSize+4, logoSize+4);
         ctx.fillStyle = "white"; ctx.textAlign = "center"; ctx.font = "bold 45px Arial";
-        ctx.fillText("GAVOILLE", 540, 190);
-        ctx.font = "30px Arial";
-        ctx.fillText("Opticiens", 585, 230);
+        ctx.fillText("GAVOILLE", 540, 190); ctx.font = "30px Arial"; ctx.fillText("Opticiens", 585, 230);
         
-        ctx.fillStyle = "#1A1A18"; ctx.font = "bold 30px Montserrat";
-        ctx.fillText("JASSANS RIOTTIER", 540, 370);
+        ctx.fillStyle = "#1A1A18"; ctx.font = "bold 55px Montserrat"; ctx.fillText("Aidez-moi à choisir !", 540, 460);
 
-        // SONDAGE
-        ctx.fillStyle = "#E20613"; ctx.font = "bold 55px Montserrat";
-        ctx.fillText("Aidez-moi à choisir !", 540, 460);
-
-        const w = 480; const h = 640;
         const pos = [[40, 520], [560, 520], [40, 1190], [560, 1190]];
-
         for(let i=0; i<4; i++) {
             if(images[i]) {
                 const img = await new Promise(res => { const o = new Image(); o.onload = () => res(o); o.src = images[i]; });
-                ctx.drawImage(img, pos[i][0], pos[i][1], w, h);
-                ctx.strokeStyle = "#E20613"; ctx.lineWidth = 10; ctx.strokeRect(pos[i][0], pos[i][1], w, h);
+                ctx.drawImage(img, pos[i][0], pos[i][1], 480, 640);
+                ctx.strokeStyle = "#E20613"; ctx.lineWidth = 10; ctx.strokeRect(pos[i][0], pos[i][1], 480, 640);
                 ctx.fillStyle = "#E20613"; ctx.fillRect(pos[i][0], pos[i][1], 70, 70);
                 ctx.fillStyle = "white"; ctx.font = "bold 45px Arial"; ctx.fillText(i+1, pos[i][0]+35, pos[i][1]+50);
             }
@@ -150,12 +170,12 @@
 
         ctx.fillStyle = "#1A1A18"; ctx.fillRect(0, 1820, 1080, 100);
         ctx.fillStyle = "white"; ctx.font = "bold 35px Montserrat";
-        ctx.fillText("TAGUEZ @GAVOILLE_OPTICIENS_JASSANS EN STORY !", 540, 1885);
+        ctx.fillText("TAGUEZ @GAVOILLE_OPTICIENS_JASSANS", 540, 1885);
 
         canvas.toBlob(async (blob) => {
-            const file = new File([blob], "choix-gavoille.jpg", { type: "image/jpeg" });
+            const file = new File([blob], "mon-choix.jpg", { type: "image/jpeg" });
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                await navigator.share({ files: [file], title: 'Gavoille Opticiens' });
+                await navigator.share({ files: [file] });
             } else {
                 window.open(canvas.toDataURL());
             }
