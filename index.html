@@ -37,15 +37,18 @@
         .main-container { 
             flex: 1; display: flex; flex-direction: row; 
             padding: 15px; gap: 15px; overflow: hidden;
+            /* Espace pour les contrôles flottants */
             margin-bottom: calc(110px + env(safe-area-inset-bottom));
         }
 
         @media (max-width: 768px) {
             .main-container { flex-direction: column; }
+            .mirror-view { flex: 2 !important; }
             .side-gallery { 
-                flex: 0.6 !important; 
+                flex: 1 !important; 
                 grid-template-columns: repeat(4, 1fr) !important; 
                 grid-template-rows: 1fr !important; 
+                gap: 5px;
             }
         }
 
@@ -53,8 +56,23 @@
         #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); filter: brightness(1.05) contrast(1.05); }
 
         .side-gallery { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; }
-        .slot { background: #222; border-radius: 12px; border: 2px solid transparent; overflow: hidden; position: relative; aspect-ratio: 3/4; transition: 0.3s; }
-        .slot img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* Conteneur pour vignettes sans déformation */
+        .slot { 
+            background: #222; border-radius: 12px; border: 2px solid transparent; 
+            overflow: hidden; position: relative; 
+            /* Ratio 3:4 forcé pour vignettes */
+            aspect-ratio: 3/4; 
+            transition: 0.3s; 
+        }
+        
+        /* Image dans vignette : Crop automatique */
+        .slot img { 
+            width: 100%; height: 100%; 
+            object-fit: cover; /* Recadre sans écraser */
+            object-position: center;
+        }
+        
         .slot.active { border-color: var(--red); box-shadow: 0 0 15px rgba(226, 6, 19, 0.4); transform: scale(1.02); }
 
         /* BARRE DE CONTRÔLES SÉCURISÉE */
@@ -82,6 +100,9 @@
         .btn-reset { background: transparent; color: #999; text-decoration: underline; font-weight: 400; text-transform: none; }
 
         #flash { position: absolute; top:0; left:0; width:100%; height:100%; background:white; opacity:0; pointer-events:none; z-index: 10; }
+        
+        /* Canvas caché pour l'export, doit garder le ratio Story */
+        #exportCanvas { display: none; }
     </style>
 </head>
 <body>
@@ -112,48 +133,81 @@
     <button class="btn-ui" onclick="shareViralLookbook()">Partager</button>
 </div>
 
-<canvas id="exportCanvas" style="display:none;"></canvas>
+<canvas id="exportCanvas"></canvas>
 
 <script>
     const video = document.getElementById('video');
     let currentSlot = 1;
-    let images = [null, null, null, null];
+    let imagesBlob = [null, null, null, null]; // Stocke les Blobs d'images pour l'export
 
     navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } } 
-    }).then(s => video.srcObject = s).catch(e => alert("Caméra non accessible"));
+        video: { facingMode: "user", width: { ideal: 1920 }, height: { ideal: 1080 } } 
+    }).then(s => video.srcObject = s).catch(e => alert("Caméra non accessible."));
 
+    // Capture : Recadre la photo pour vignette sans déformer
     function capture() {
         const flash = document.getElementById('flash');
         flash.style.opacity = 1; setTimeout(() => flash.style.opacity = 0, 100);
 
         const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
         const ctx = canvas.getContext('2d');
-        ctx.filter = 'brightness(1.05) contrast(1.05)';
+        
+        // Ratio cible pour vignette : 3/4
+        const targetW = 768; 
+        const targetH = 1024;
+        canvas.width = targetW;
+        canvas.height = targetH;
+        
+        // Calcul du recadrage (Crop) au centre
+        const videoW = video.videoWidth;
+        const videoH = video.videoHeight;
+        const videoRatio = videoW / videoH;
+        const targetRatio = targetW / targetH;
+        
+        let sourceX, sourceY, sourceW, sourceH;
+        
+        if (videoRatio > targetRatio) {
+            // Vidéo trop large (ex 16:9), on coupe les côtés
+            sourceH = videoH;
+            sourceW = videoH * targetRatio;
+            sourceX = (videoW - sourceW) / 2;
+            sourceY = 0;
+        } else {
+            // Vidéo trop haute, on coupe le haut/bas
+            sourceW = videoW;
+            sourceH = videoW / targetRatio;
+            sourceX = 0;
+            sourceY = (videoH - sourceH) / 2;
+        }
+
+        // Dessin recadré avec effet miroir
+        ctx.filter = 'brightness(1.04) contrast(1.04)';
         ctx.translate(canvas.width, 0); ctx.scale(-1, 1);
-        ctx.drawImage(video, 0, 0);
+        ctx.drawImage(video, sourceX, sourceY, sourceW, sourceH, 0, 0, targetW, targetH);
         
-        const data = canvas.toDataURL('image/jpeg', 0.85);
-        images[currentSlot-1] = data;
-        
-        document.getElementById('s'+currentSlot).innerHTML = `<img src="${data}">`;
-        document.querySelectorAll('.slot').forEach(s => s.classList.remove('active'));
-        
-        currentSlot = (currentSlot % 4) + 1;
-        document.getElementById('s'+currentSlot).classList.add('active');
+        // Stockage du Blob pour l'export final
+        canvas.toBlob((blob) => {
+            imagesBlob[currentSlot-1] = blob;
+            const url = URL.createObjectURL(blob);
+            document.getElementById('s'+currentSlot).innerHTML = `<img src="${url}">`;
+            
+            // Update slots
+            document.querySelectorAll('.slot').forEach(s => s.classList.remove('active'));
+            currentSlot = (currentSlot % 4) + 1;
+            document.getElementById('s'+currentSlot).classList.add('active');
+        }, 'image/jpeg', 0.9);
     }
 
+    // Export Final : Monte le Lookbook Story avec images recadrées
     async function shareViralLookbook() {
-        if(!images[0]) { alert("Prenez au moins une photo !"); return; }
+        if(!imagesBlob[0]) { alert("Prenez au moins une photo !"); return; }
         const canvas = document.getElementById('exportCanvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = 1080; canvas.height = 1920;
+        canvas.width = 1080; canvas.height = 1920; // Format Story
 
         // Fond Magazine
         let grad = ctx.createLinearGradient(0, 0, 0, 1920);
-        grad.addColorStop(0, "#FFFFFF"); grad.addColorStop(1, "#F4F4F4");
+        grad.addColorStop(0, "#FFFFFF"); grad.addColorStop(1, "#F0F0F0");
         ctx.fillStyle = grad; ctx.fillRect(0,0,1080,1920);
 
         // Logo Carré Officiel
@@ -171,16 +225,20 @@
         ctx.font = "italic 40px Georgia";
         ctx.fillText("Quelle paire pour ma nouvelle tête ?", 540, 485);
 
-        // Photos avec effet Ombre et Badge de vote
-        const w = 485; const h = 620;
-        const pos = [[35, 550], [560, 550], [35, 1200], [560, 1200]];
+        // Grille photos (ratio 3:4 maintenu)
+        const w = 485; const h = 647;
+        const pos = [[35, 550], [560, 550], [35, 1227], [560, 1227]];
 
         for(let i=0; i<4; i++) {
-            if(images[i]) {
-                const img = await new Promise(res => { const o = new Image(); o.onload = () => res(o); o.src = images[i]; });
+            if(imagesBlob[i]) {
+                const img = await new Promise(res => { 
+                    const o = new Image(); 
+                    o.onload = () => res(o); 
+                    o.src = URL.createObjectURL(imagesBlob[i]); 
+                });
                 
                 // Ombre style Magazine
-                ctx.shadowColor = "rgba(0,0,0,0.15)"; ctx.shadowBlur = 25; ctx.shadowOffsetY = 10;
+                ctx.shadowColor = "rgba(0,0,0,0.18)"; ctx.shadowBlur = 25; ctx.shadowOffsetY = 10;
                 ctx.drawImage(img, pos[i][0], pos[i][1], w, h);
                 ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
 
@@ -206,15 +264,16 @@
         ctx.fillStyle = "white"; ctx.font = "bold 30px Montserrat";
         ctx.fillText("PARTEZ AVEC LE STYLE @GAVOILLE_OPTICIENS_JASSANS", 540, 1895);
 
+        // Exportation
         canvas.toBlob(async (blob) => {
             const file = new File([blob], "mon-look-gavoille.jpg", { type: "image/jpeg" });
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 await navigator.share({ files: [file] });
             } else {
-                // Fallback si share API non supporté
+                // Fallback direct download
                 const link = document.createElement('a');
                 link.download = 'mon-look-gavoille.jpg';
-                link.href = canvas.toDataURL("image/jpeg", 0.9);
+                link.href = canvas.toDataURL("image/jpeg", 0.95);
                 link.click();
             }
         }, 'image/jpeg', 0.95);
