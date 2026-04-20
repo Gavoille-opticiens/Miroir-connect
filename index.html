@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>GAVOILLE - Miroir Connecté</title>
+    <title>GAVOILLE - LOOK BOOK</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --red: #E20613; --black: #1A1A18; }
+        :root { --red: #E20613; --black: #1A1A18; --white: #FFFFFF; }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
@@ -27,57 +28,58 @@
         
         .gavoille-logo-square { 
             display: inline-flex; background: var(--red); color: white; 
-            width: 70px; height: 70px; border: 2px solid #000; margin: 10px 0;
+            width: 80px; height: 80px; border: 2px solid #000; margin: 10px 0;
             flex-direction: column; justify-content: center; align-items: center;
         }
-        .logo-text-main { font-size: 0.7rem; font-weight: 800; line-height: 1; }
-        .logo-text-sub { font-size: 0.5rem; padding-left: 8px; }
+        .logo-text-main { font-size: 0.8rem; font-weight: 900; line-height: 1; }
+        .logo-text-sub { font-size: 0.55rem; padding-left: 10px; font-weight: 400; }
 
         .main-container { 
             flex: 1; display: flex; flex-direction: row; 
-            padding: 10px; gap: 10px; overflow: hidden;
-            margin-bottom: calc(100px + env(safe-area-inset-bottom));
+            padding: 15px; gap: 15px; overflow: hidden;
+            margin-bottom: calc(110px + env(safe-area-inset-bottom));
         }
 
         @media (max-width: 768px) {
             .main-container { flex-direction: column; }
             .side-gallery { 
-                flex: 0.5 !important; 
+                flex: 0.6 !important; 
                 grid-template-columns: repeat(4, 1fr) !important; 
                 grid-template-rows: 1fr !important; 
             }
         }
 
-        .mirror-view { flex: 2; position: relative; background: #000; border-radius: 15px; overflow: hidden; border: 1px solid #333; }
-        #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        .mirror-view { flex: 2.5; position: relative; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #333; }
+        #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); filter: brightness(1.05) contrast(1.05); }
 
-        .side-gallery { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px; }
-        .slot { background: #222; border-radius: 10px; border: 2px solid transparent; overflow: hidden; position: relative; aspect-ratio: 3/4; }
+        .side-gallery { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; }
+        .slot { background: #222; border-radius: 12px; border: 2px solid transparent; overflow: hidden; position: relative; aspect-ratio: 3/4; transition: 0.3s; }
         .slot img { width: 100%; height: 100%; object-fit: cover; }
-        .slot.active { border-color: var(--red); box-shadow: 0 0 10px rgba(226, 6, 19, 0.4); }
+        .slot.active { border-color: var(--red); box-shadow: 0 0 15px rgba(226, 6, 19, 0.4); transform: scale(1.02); }
 
         /* BARRE DE CONTRÔLES SÉCURISÉE */
         .floating-controls { 
             position: fixed; 
-            bottom: calc(20px + env(safe-area-inset-bottom));
+            bottom: calc(25px + env(safe-area-inset-bottom));
             left: 50%; transform: translateX(-50%);
-            width: 92%; max-width: 500px;
-            background: white;
-            padding: 12px 25px; border-radius: 60px;
+            width: 90%; max-width: 450px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 25px; border-radius: 60px;
             display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             z-index: 9999;
+            backdrop-filter: blur(10px);
         }
 
         .shutter { 
-            width: 70px; height: 70px; background: var(--red); 
-            border-radius: 50%; border: 5px solid #f8d0d2; cursor: pointer; 
-            transition: transform 0.1s active;
+            width: 75px; height: 75px; background: var(--red); 
+            border-radius: 50%; border: 5px solid white; cursor: pointer; 
+            box-shadow: 0 0 0 3px var(--red);
         }
         .shutter:active { transform: scale(0.9); }
         
-        .btn-ui { background: var(--black); color: white; border: none; padding: 12px 20px; border-radius: 30px; font-weight: bold; font-size: 0.8rem; cursor: pointer; }
-        .btn-reset { background: transparent; color: #999; text-decoration: underline; font-weight: normal; }
+        .btn-ui { background: var(--black); color: white; border: none; padding: 14px 24px; border-radius: 30px; font-weight: 900; font-size: 0.8rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-reset { background: transparent; color: #999; text-decoration: underline; font-weight: 400; text-transform: none; }
 
         #flash { position: absolute; top:0; left:0; width:100%; height:100%; background:white; opacity:0; pointer-events:none; z-index: 10; }
     </style>
@@ -107,7 +109,7 @@
 <div class="floating-controls">
     <button class="btn-ui btn-reset" onclick="location.reload()">Reset</button>
     <button class="shutter" onclick="capture()"></button>
-    <button class="btn-ui" onclick="shareViralWithPoll()">PARTAGER</button>
+    <button class="btn-ui" onclick="shareViralLookbook()">Partager</button>
 </div>
 
 <canvas id="exportCanvas" style="display:none;"></canvas>
@@ -118,12 +120,8 @@
     let images = [null, null, null, null];
 
     navigator.mediaDevices.getUserMedia({ 
-        video: { 
-            facingMode: "user",
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-        } 
-    }).then(s => video.srcObject = s);
+        video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } } 
+    }).then(s => video.srcObject = s).catch(e => alert("Caméra non accessible"));
 
     function capture() {
         const flash = document.getElementById('flash');
@@ -133,7 +131,7 @@
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         const ctx = canvas.getContext('2d');
-        ctx.filter = 'brightness(1.05) contrast(1.1)';
+        ctx.filter = 'brightness(1.05) contrast(1.05)';
         ctx.translate(canvas.width, 0); ctx.scale(-1, 1);
         ctx.drawImage(video, 0, 0);
         
@@ -147,43 +145,79 @@
         document.getElementById('s'+currentSlot).classList.add('active');
     }
 
-    async function shareViralWithPoll() {
-        if(!images[0]) return;
+    async function shareViralLookbook() {
+        if(!images[0]) { alert("Prenez au moins une photo !"); return; }
         const canvas = document.getElementById('exportCanvas');
         const ctx = canvas.getContext('2d');
         canvas.width = 1080; canvas.height = 1920;
-        ctx.fillStyle = "white"; ctx.fillRect(0,0,1080,1920);
 
-        // Logo Carré sur l'image finale
-        const logoSize = 250;
-        ctx.fillStyle = "#E20613"; ctx.fillRect(415, 80, logoSize, logoSize);
-        ctx.strokeStyle = "black"; ctx.lineWidth = 4; ctx.strokeRect(413, 78, logoSize+4, logoSize+4);
-        ctx.fillStyle = "white"; ctx.textAlign = "center"; ctx.font = "bold 45px Arial";
-        ctx.fillText("GAVOILLE", 540, 190); ctx.font = "30px Arial"; ctx.fillText("Opticiens", 585, 230);
+        // Fond Magazine
+        let grad = ctx.createLinearGradient(0, 0, 0, 1920);
+        grad.addColorStop(0, "#FFFFFF"); grad.addColorStop(1, "#F4F4F4");
+        ctx.fillStyle = grad; ctx.fillRect(0,0,1080,1920);
+
+        // Logo Carré Officiel
+        const logoSize = 220;
+        const logoX = (1080 - logoSize) / 2;
+        ctx.fillStyle = "#E20613"; ctx.fillRect(logoX, 100, logoSize, logoSize);
+        ctx.strokeStyle = "black"; ctx.lineWidth = 4; ctx.strokeRect(logoX - 2, 98, logoSize + 4, logoSize + 4);
+        ctx.fillStyle = "white"; ctx.textAlign = "center";
+        ctx.font = "bold 40px Arial"; ctx.fillText("GAVOILLE", 540, 195);
+        ctx.font = "28px Arial"; ctx.fillText("Opticiens", 580, 235);
         
-        ctx.fillStyle = "#1A1A18"; ctx.font = "bold 55px Arial"; ctx.fillText("Aidez-moi à choisir !", 540, 460);
+        // Titre Lookbook
+        ctx.fillStyle = "#1A1A18"; ctx.font = "900 70px Montserrat";
+        ctx.fillText("LOOK BOOK", 540, 420);
+        ctx.font = "italic 40px Georgia";
+        ctx.fillText("Quelle paire pour ma nouvelle tête ?", 540, 485);
 
-        const pos = [[40, 520], [560, 520], [40, 1190], [560, 1190]];
+        // Photos avec effet Ombre et Badge de vote
+        const w = 485; const h = 620;
+        const pos = [[35, 550], [560, 550], [35, 1200], [560, 1200]];
+
         for(let i=0; i<4; i++) {
             if(images[i]) {
                 const img = await new Promise(res => { const o = new Image(); o.onload = () => res(o); o.src = images[i]; });
-                ctx.drawImage(img, pos[i][0], pos[i][1], 480, 640);
-                ctx.strokeStyle = "#E20613"; ctx.lineWidth = 10; ctx.strokeRect(pos[i][0], pos[i][1], 480, 640);
-                ctx.fillStyle = "#E20613"; ctx.fillRect(pos[i][0], pos[i][1], 70, 70);
-                ctx.fillStyle = "white"; ctx.font = "bold 45px Arial"; ctx.fillText(i+1, pos[i][0]+35, pos[i][1]+50);
+                
+                // Ombre style Magazine
+                ctx.shadowColor = "rgba(0,0,0,0.15)"; ctx.shadowBlur = 25; ctx.shadowOffsetY = 10;
+                ctx.drawImage(img, pos[i][0], pos[i][1], w, h);
+                ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+
+                // Bordure Rouge
+                ctx.strokeStyle = "#E20613"; ctx.lineWidth = 8;
+                ctx.strokeRect(pos[i][0], pos[i][1], w, h);
+
+                // Pastille interactive pour le vote
+                ctx.fillStyle = "white"; ctx.beginPath();
+                ctx.arc(pos[i][0] + w - 55, pos[i][1] + 55, 45, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = "#E20613"; ctx.lineWidth = 4; ctx.stroke();
+                ctx.fillStyle = "#E20613"; ctx.font = "bold 50px Arial";
+                ctx.fillText(i+1, pos[i][0] + w - 55, pos[i][1] + 72);
             }
         }
 
-        ctx.fillStyle = "#1A1A18"; ctx.fillRect(0, 1820, 1080, 100);
-        ctx.fillStyle = "white"; ctx.font = "bold 35px Montserrat";
-        ctx.fillText("TAGUEZ @GAVOILLE_OPTICIENS_JASSANS", 540, 1885);
+        // Appel à l'action
+        ctx.fillStyle = "#E20613"; ctx.font = "bold 50px Montserrat";
+        ctx.fillText("VOTE EN RÉPONDANT ICI ! 👇", 540, 1800);
+
+        // Footer
+        ctx.fillStyle = "#1A1A18"; ctx.fillRect(0, 1845, 1080, 75);
+        ctx.fillStyle = "white"; ctx.font = "bold 30px Montserrat";
+        ctx.fillText("PARTEZ AVEC LE STYLE @GAVOILLE_OPTICIENS_JASSANS", 540, 1895);
 
         canvas.toBlob(async (blob) => {
-            const file = new File([blob], "choix-gavoille.jpg", { type: "image/jpeg" });
+            const file = new File([blob], "mon-look-gavoille.jpg", { type: "image/jpeg" });
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 await navigator.share({ files: [file] });
+            } else {
+                // Fallback si share API non supporté
+                const link = document.createElement('a');
+                link.download = 'mon-look-gavoille.jpg';
+                link.href = canvas.toDataURL("image/jpeg", 0.9);
+                link.click();
             }
-        }, 'image/jpeg');
+        }, 'image/jpeg', 0.95);
     }
 </script>
 </body>
