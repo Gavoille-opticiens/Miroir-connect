@@ -24,25 +24,10 @@
         }
         
         .mirror-view { flex: 2.5; position: relative; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #333; }
-        
-        /* Application du filtre Bonne Mine (Chaleur + Contraste doux) */
-        #video { 
-            width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); background: #000; 
-            filter: sepia(0.15) saturate(1.1) contrast(1.05) brightness(1.02); 
-        }
+        #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); background: #000; filter: sepia(0.12) saturate(1.1) contrast(1.05); }
 
-        /* Zone du Décompte */
-        #countdown-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; justify-content: center; align-items: center;
-            background: rgba(0,0,0,0.2); z-index: 20; opacity: 0; pointer-events: none;
-            transition: opacity 0.2s;
-        }
-        #countdown-text {
-            font-size: 150px; font-weight: 900; color: white;
-            text-shadow: 0 0 20px rgba(0,0,0,0.8);
-            transform: scale(0.5); transition: transform 0.2s;
-        }
+        #countdown-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.2); z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+        #countdown-text { font-size: 150px; font-weight: 900; color: white; text-shadow: 0 0 20px rgba(0,0,0,0.8); transform: scale(0.5); transition: transform 0.2s; }
         #countdown-overlay.show { opacity: 1; }
         #countdown-overlay.show #countdown-text { transform: scale(1); }
 
@@ -51,13 +36,10 @@
         .slot img { width: 100%; height: 100%; object-fit: cover; }
         .slot.active { border-color: var(--red); box-shadow: 0 0 15px rgba(226, 6, 19, 0.5); }
 
-        .floating-controls { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: 90%; max-width: 450px; background: rgba(255, 255, 255, 0.95); padding: 15px; border-radius: 50px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 999; backdrop-filter: blur(5px); }
-        .shutter { width: 70px; height: 70px; background: var(--red); border-radius: 50%; border: 5px solid white; cursor: pointer; transition: transform 0.1s; }
-        .shutter:active { transform: scale(0.9); }
-        .shutter.counting { background: #555; border-color: #888; pointer-events: none; animation: pulse 1s infinite; }
+        .floating-controls { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: 90%; max-width: 450px; background: rgba(255, 255, 255, 0.95); padding: 15px; border-radius: 50px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 999; }
+        .shutter { width: 70px; height: 70px; background: var(--red); border-radius: 50%; border: 5px solid white; cursor: pointer; }
+        .shutter.counting { background: #555; pointer-events: none; }
         
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
         .btn-ui { background: var(--black); color: white; border: none; padding: 12px 20px; border-radius: 30px; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
         #flash { position: absolute; top:0; left:0; width:100%; height:100%; background:white; opacity:0; pointer-events:none; z-index: 30; }
         canvas { display: none; }
@@ -72,9 +54,7 @@
 <div class="main-container">
     <div class="mirror-view">
         <video id="video" autoplay playsinline muted></video>
-        <div id="countdown-overlay">
-            <div id="countdown-text"></div>
-        </div>
+        <div id="countdown-overlay"><div id="countdown-text"></div></div>
         <div id="flash"></div>
     </div>
     <div class="side-gallery">
@@ -103,28 +83,21 @@
     let isCounting = false;
 
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-    .then(stream => { 
-        video.srcObject = stream;
-        video.onloadedmetadata = () => video.play();
-    })
-    .catch(err => alert("Erreur caméra : " + err));
+    .then(s => video.srcObject = s).catch(err => alert("Erreur caméra : " + err));
 
-    // Fonction principale qui lance le décompte avant la capture
     function startCaptureSequence() {
-        if (isCounting) return; // Évite les doubles clics
+        if (isCounting) return;
         isCounting = true;
         shutterBtn.classList.add('counting');
-        runCountdown(3); // Lance le décompte à partir de 3
+        runCountdown(3);
     }
 
     function runCountdown(count) {
         countdownOverlay.classList.add('show');
         countdownText.innerText = count;
-
         if (count > 0) {
-            setTimeout(() => runCountdown(count - 1), 1000); // Décompte chaque seconde
+            setTimeout(() => runCountdown(count - 1), 1000);
         } else {
-            // Arrivé à 0, on capture
             countdownOverlay.classList.remove('show');
             performCapture();
             isCounting = false;
@@ -133,40 +106,25 @@
     }
 
     function performCapture() {
-        const flash = document.getElementById('flash');
-        flash.style.opacity = 1; setTimeout(() => flash.style.opacity = 0, 100);
+        document.getElementById('flash').style.opacity = 1; 
+        setTimeout(() => document.getElementById('flash').style.opacity = 0, 100);
 
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        
-        canvas.width = 600;
-        canvas.height = 800;
+        canvas.width = 600; canvas.height = 800;
 
-        const vW = video.videoWidth;
-        const vH = video.videoHeight;
-        
+        const vW = video.videoWidth; const vH = video.videoHeight;
         let sW, sH, sX, sY;
         const targetRatio = 600 / 800;
-        const currentRatio = vW / vH;
-
-        if (currentRatio > targetRatio) {
-            sW = vH * targetRatio; sH = vH;
-            sX = (vW - sW) / 2; sY = 0;
-        } else {
-            sW = vW; sH = vW / targetRatio;
-            sX = 0; sY = (vH - sH) / 2;
-        }
+        if ((vW / vH) > targetRatio) { sH = vH; sW = vH * targetRatio; sX = (vW - sW) / 2; sY = 0; }
+        else { sW = vW; sH = vW / targetRatio; sX = 0; sY = (vH - sH) / 2; }
 
         ctx.translate(600, 0); ctx.scale(-1, 1);
-        
-        // Application du filtre Bonne Mine sur la capture finale
-        ctx.filter = 'sepia(0.12) saturate(1.08) contrast(1.04) brightness(1.02)';
-        
+        ctx.filter = 'sepia(0.1) saturate(1.1) contrast(1.05)';
         ctx.drawImage(video, sX, sY, sW, sH, 0, 0, 600, 800);
         
         const data = canvas.toDataURL('image/jpeg', 0.9);
         imagesData[currentSlot-1] = data;
-        
         document.getElementById('s'+currentSlot).innerHTML = `<img src="${data}">`;
         document.querySelectorAll('.slot').forEach(s => s.classList.remove('active'));
         currentSlot = (currentSlot % 4) + 1;
@@ -180,26 +138,24 @@
         canvas.width = 1080; canvas.height = 1920;
 
         ctx.fillStyle = "white"; ctx.fillRect(0,0,1080,1920);
-
         ctx.fillStyle = "#E20613"; ctx.fillRect(430, 80, 220, 220);
         ctx.strokeStyle = "black"; ctx.lineWidth = 4; ctx.strokeRect(428, 78, 224, 224);
         ctx.fillStyle = "white"; ctx.textAlign = "center";
         ctx.font = "bold 40px Arial"; ctx.fillText("GAVOILLE", 540, 185);
         ctx.font = "28px Arial"; ctx.fillText("Opticiens", 580, 225);
 
-        ctx.fillStyle = "#1A1A18"; ctx.font = "900 80px Montserrat"; ctx.fillText("LOOK BOOK", 540, 420);
+        ctx.fillStyle = "#1A1A18"; ctx.font = "bold 80px Montserrat"; ctx.fillText("LOOK BOOK", 540, 420);
         ctx.font = "italic 40px Georgia"; ctx.fillText("Quelle paire pour ma nouvelle tête ?", 540, 490);
 
         const pos = [[40, 560], [560, 560], [40, 1220], [560, 1220]];
         for(let i=0; i<4; i++) {
             if(imagesData[i]) {
                 const img = await new Promise(r => { const o = new Image(); o.onload = () => r(o); o.src = imagesData[i]; });
-                ctx.drawImage(img, 0, 0, 600, 800, pos[i][0], pos[i][1], 480, 640);
+                ctx.drawImage(img, pos[i][0], pos[i][1], 480, 640);
                 ctx.strokeStyle = "#E20613"; ctx.lineWidth = 8; ctx.strokeRect(pos[i][0], pos[i][1], 480, 640);
-                
-                ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(pos[i][0]+480-50, pos[i][1]+50, 45, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(pos[i][0]+430, pos[i][1]+50, 45, 0, Math.PI*2); ctx.fill();
                 ctx.strokeStyle = "#E20613"; ctx.lineWidth = 3; ctx.stroke();
-                ctx.fillStyle = "#E20613"; ctx.font = "bold 50px Arial"; ctx.fillText(i+1, pos[i][0]+480-50, pos[i][1]+68);
+                ctx.fillStyle = "#E20613"; ctx.font = "bold 50px Arial"; ctx.fillText(i+1, pos[i][0]+430, pos[i][1]+68);
             }
         }
 
@@ -207,11 +163,26 @@
         ctx.fillStyle = "#1A1A18"; ctx.fillRect(0, 1860, 1080, 60);
         ctx.fillStyle = "white"; ctx.font = "bold 25px Montserrat"; ctx.fillText("TAGUEZ @GAVOILLE_OPTICIENS_JASSANS", 540, 1900);
 
-        canvas.toBlob(async (b) => {
-            const f = new File([b], "lookbook.jpg", {type:"image/jpeg"});
-            if(navigator.canShare && navigator.canShare({files:[f]})) await navigator.share({files:[f]});
-            else window.open(canvas.toDataURL());
-        }, 'image/jpeg', 0.95);
+        // Méthode de partage sécurisée
+        try {
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], "lookbook-gavoille.jpg", { type: "image/jpeg" });
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Mon Look Gavoille',
+                    });
+                } else {
+                    const dataUrl = canvas.toDataURL("image/jpeg");
+                    const link = document.createElement('a');
+                    link.download = 'lookbook-gavoille.jpg';
+                    link.href = dataUrl;
+                    link.click();
+                }
+            }, 'image/jpeg', 0.9);
+        } catch (err) {
+            alert("Utilisez le bouton de téléchargement de votre navigateur");
+        }
     }
 </script>
 </body>
