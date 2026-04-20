@@ -4,35 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>GAVOILLE MIRROR DIRECT SHARE</title>
+    <title>GAVOILLE MIRROR - VIRAL V3</title>
     <style>
-        :root { --red: #E60000; --black: #0b0b0b; --ui: #1c1c1e; }
-        body { margin: 0; background: var(--black); color: white; font-family: 'Helvetica', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        :root { --red: #E20613; --black: #1A1A18; --grey: #F8F8F8; }
         
-        header { padding: 15px; text-align: center; border-bottom: 1px solid #222; }
-        .logo { font-weight: 800; letter-spacing: 4px; font-size: 1.2rem; text-transform: uppercase; }
-
-        .main-container { flex: 1; display: flex; padding: 10px; gap: 10px; }
+        body { 
+            margin: 0; background: var(--black); color: white; 
+            font-family: 'Montserrat', sans-serif; 
+            height: 100vh; display: flex; flex-direction: column; overflow: hidden; 
+        }
         
-        .mirror-view { flex: 2; position: relative; background: #000; border-radius: 15px; overflow: hidden; border: 2px solid #333; }
-        #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        header { padding: 15px; background: white; text-align: center; border-bottom: 3px solid var(--red); flex-shrink: 0; }
 
-        .side-gallery { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px; }
-        .slot { background: var(--ui); border-radius: 10px; border: 2px solid #333; overflow: hidden; position: relative; }
+        .main-container { flex: 1; display: flex; flex-direction: row; padding: 15px; gap: 15px; overflow: hidden; }
+
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+            .mirror-view { flex: 2 !important; }
+            .side-gallery { flex: 0.7 !important; grid-template-columns: repeat(4, 1fr) !important; grid-template-rows: 1fr !important; }
+        }
+
+        .mirror-view { flex: 2.5; position: relative; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #444; }
+        #video { 
+            width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); 
+            filter: brightness(1.05) contrast(1.1); /* Filtre "Bonne Mine" */
+        }
+
+        .side-gallery { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; }
+        .slot { background: #222; border-radius: 12px; border: 2px solid transparent; overflow: hidden; position: relative; aspect-ratio: 3/4; }
         .slot img { width: 100%; height: 100%; object-fit: cover; }
-        .slot.active { border-color: var(--red); }
-        .slot::after { content: attr(data-label); position: absolute; top: 5px; left: 5px; background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; }
+        .slot.active { border-color: var(--red); box-shadow: 0 0 15px rgba(226, 6, 19, 0.5); }
 
-        .controls { padding: 20px; display: flex; justify-content: center; align-items: center; gap: 40px; background: #111; }
-        .shutter { width: 75px; height: 75px; background: white; border-radius: 50%; border: 5px solid var(--red); cursor: pointer; }
-        .share-btn { background: var(--red); color: white; border: none; padding: 15px 35px; border-radius: 30px; font-weight: bold; font-size: 1rem; cursor: pointer; }
+        .controls { padding: 20px; display: flex; justify-content: center; align-items: center; gap: 30px; background: white; flex-shrink: 0; }
+        .shutter { width: 75px; height: 75px; background: var(--red); border-radius: 50%; border: 6px solid #f8d0d2; cursor: pointer; }
+        .share-btn { 
+            background: var(--black); color: white; border: none; padding: 15px 30px; 
+            border-radius: 50px; font-weight: bold; font-size: 0.9rem; cursor: pointer; 
+            display: flex; align-items: center; gap: 10px;
+        }
         
         #flash { position: absolute; top:0; left:0; width:100%; height:100%; background:white; opacity:0; pointer-events:none; }
     </style>
 </head>
 <body>
 
-<header><div class="logo">GAVOILLE <span style="color:var(--red)">Opticiens</span></div></header>
+<header>
+    <div style="color:var(--black); font-weight:900; letter-spacing:-1px; font-size:1.3rem; line-height:1;">
+        C. et F. GAVOILLE <span style="color:var(--red)">OPTICIENS</span>
+    </div>
+    <div style="color:#666; font-size:0.6rem; letter-spacing:3px; text-transform:uppercase; margin-top:5px;">Jassans Riottier</div>
+</header>
 
 <div class="main-container">
     <div class="mirror-view">
@@ -40,17 +61,17 @@
         <div id="flash"></div>
     </div>
     <div class="side-gallery">
-        <div class="slot active" id="s1" data-label="1"></div>
-        <div class="slot" id="s2" data-label="2"></div>
-        <div class="slot" id="s3" data-label="3"></div>
-        <div class="slot" id="s4" data-label="4"></div>
+        <div class="slot active" id="s1"></div>
+        <div class="slot" id="s2"></div>
+        <div class="slot" id="s3"></div>
+        <div class="slot" id="s4"></div>
     </div>
 </div>
 
 <div class="controls">
-    <button onclick="location.reload()" style="background:none; border:none; color:#555; text-decoration:underline;">Reset</button>
-    <button class="shutter" onclick="capture()"></button>
-    <button class="share-btn" onclick="shareDirect()">PARTAGER LE KIT</button>
+    <button onclick="location.reload()" style="background:none; border:none; color:#999; text-decoration:underline; font-size:0.8rem;">Reset</button>
+    <button class="shutter" id="snapBtn" onclick="capture()"></button>
+    <button class="share-btn" onclick="shareViral()">🚀 PARTAGER MA STORY</button>
 </div>
 
 <canvas id="exportCanvas" style="display:none;"></canvas>
@@ -70,6 +91,9 @@
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         const ctx = canvas.getContext('2d');
+        
+        // Filtre de rendu photo
+        ctx.filter = 'brightness(1.05) contrast(1.1)';
         ctx.translate(canvas.width, 0); ctx.scale(-1, 1);
         ctx.drawImage(video, 0, 0);
         
@@ -83,56 +107,69 @@
         document.getElementById('s'+currentSlot).classList.add('active');
     }
 
-    async function shareDirect() {
+    async function shareViral() {
+        if(!images[0]) { alert("Prenez au moins une photo !"); return; }
+        
         const canvas = document.getElementById('exportCanvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = 1080; canvas.height = 1600;
+        canvas.width = 1080; canvas.height = 1920;
 
-        // Background & Bandeau
-        ctx.fillStyle = "black"; ctx.fillRect(0,0,1080,1600);
-        ctx.fillStyle = "white"; ctx.font = "bold 50px Arial"; ctx.textAlign = "center";
-        ctx.fillText("GAVOILLE OPTICIENS", 540, 100);
-        ctx.fillStyle = "#E60000"; ctx.font = "35px Arial";
-        ctx.fillText("Aidez-moi à choisir ma monture !", 540, 160);
+        // Design Fond
+        ctx.fillStyle = "white"; ctx.fillRect(0,0,1080,1920);
 
-        // Grille de 4
-        const w = 480; const h = 600;
-        const positions = [[40, 220], [560, 220], [40, 860], [560, 860]];
+        // Logo & Branding
+        ctx.fillStyle = "#1A1A18"; ctx.font = "bold 65px Montserrat"; ctx.textAlign = "center";
+        ctx.fillText("C. et F. GAVOILLE", 540, 160);
+        ctx.fillStyle = "#E20613"; ctx.fillText("OPTICIENS", 540, 230);
+        
+        // Sticker Instagram (Viralité)
+        ctx.fillStyle = "#F4F4F4"; ctx.roundRect(300, 260, 480, 70, 35); ctx.fill();
+        ctx.fillStyle = "#1A1A18"; ctx.font = "bold 35px Montserrat";
+        ctx.fillText("📸 @gavoille_opticiens_jassans", 540, 308);
+
+        // Invitation
+        ctx.fillStyle = "#1A1A18"; ctx.font = "italic 45px Georgia";
+        ctx.fillText("Aidez-moi à choisir mes lunettes !", 540, 420);
+
+        // Grille photos
+        const w = 480; const h = 640;
+        const pos = [[40, 500], [560, 500], [40, 1170], [560, 1170]];
 
         for(let i=0; i<4; i++) {
             if(images[i]) {
-                const img = await loadImage(images[i]);
-                ctx.drawImage(img, positions[i][0], positions[i][1], w, h);
-                ctx.strokeStyle = "#E60000"; ctx.lineWidth = 5;
-                ctx.strokeRect(positions[i][0], positions[i][1], w, h);
+                const img = await new Promise(res => { const o = new Image(); o.onload = () => res(o); o.src = images[i]; });
+                ctx.drawImage(img, pos[i][0], pos[i][1], w, h);
+                ctx.strokeStyle = "#E20613"; ctx.lineWidth = 10; ctx.strokeRect(pos[i][0], pos[i][1], w, h);
+                
+                // Badge de vote
+                ctx.fillStyle = "#E20613"; ctx.fillRect(pos[i][0], pos[i][1], 70, 70);
+                ctx.fillStyle = "white"; ctx.font = "bold 45px Arial"; ctx.fillText(i+1, pos[i][0]+35, pos[i][1]+50);
             }
         }
 
-        // Conversion en fichier pour le partage iOS
+        // Footer Viral
+        ctx.fillStyle = "#1A1A18"; ctx.fillRect(0, 1820, 1080, 100);
+        ctx.fillStyle = "white"; ctx.font = "bold 35px Montserrat";
+        ctx.fillText("TAGUEZ @GAVOILLE_OPTICIENS_JASSANS EN STORY !", 540, 1885);
+
         canvas.toBlob(async (blob) => {
-            const file = new File([blob], "mon-look-gavoille.jpg", { type: "image/jpeg" });
+            const file = new File([blob], "mon-choix-gavoille.jpg", { type: "image/jpeg" });
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                try {
-                    await navigator.share({
-                        files: [file],
-                        title: 'Mon look Gavoille Opticiens',
-                        text: 'Quelle monture me va le mieux ?'
-                    });
-                } catch (err) {
-                    console.log("Partage annulé ou erreur");
-                }
+                await navigator.share({ files: [file], title: 'Gavoille Opticiens' });
             } else {
-                alert("Le partage direct n'est pas supporté sur ce navigateur. Utilisez Safari sur iPad.");
+                window.open(canvas.toDataURL());
             }
         }, 'image/jpeg');
     }
 
-    function loadImage(src) {
-        return new Promise((resolve) => {
-            const img = new Image();
-            img.onload = () => resolve(img);
-            img.src = src;
-        });
+    // Helper roundRect pour les versions plus anciennes de navigateurs
+    if (!CanvasRenderingContext2D.prototype.roundRect) {
+        CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+            if (w < 2 * r) r = w / 2; if (h < 2 * r) r = h / 2;
+            this.beginPath(); this.moveTo(x + r, y); this.arcTo(x + w, y, x + w, y + h, r);
+            this.arcTo(x + w, y + h, x, y + h, r); this.arcTo(x, y + h, x, y, r);
+            this.arcTo(x, y, x + w, y, r); this.closePath(); return this;
+        };
     }
 </script>
 </body>
