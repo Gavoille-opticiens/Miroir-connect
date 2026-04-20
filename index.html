@@ -3,145 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Miroir Gavoille Opticiens</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>GAVOILLE MIRROR</title>
     <style>
         :root {
-            --gavoille-red: #e60000;
-            --gavoille-black: #1a1a1a;
-            --gavoille-wood: #d2b48c;
+            --red: #E60000;
+            --black: #000000;
+            --grey: #1c1c1e;
         }
 
         body {
             margin: 0;
-            padding: 0;
-            background: var(--gavoille-black);
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: var(--black);
             color: white;
-            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex;
             flex-direction: column;
             height: 100vh;
+            overflow: hidden;
         }
 
+        /* En-tête */
         header {
-            padding: 20px;
+            padding: 30px 0 10px 0;
             text-align: center;
-            border-bottom: 1px solid #333;
-        }
-
-        .logo {
-            font-weight: bold;
-            letter-spacing: 2px;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 3px;
             text-transform: uppercase;
         }
 
-        .main-container {
-            display: flex;
-            flex: 1;
-            padding: 20px;
-            gap: 20px;
-        }
-
-        /* Le Miroir */
-        .mirror-section {
-            flex: 2;
+        /* Zone Miroir Principale */
+        .mirror-container {
             position: relative;
-            background: #000;
-            border-radius: 15px;
+            flex: 1;
+            margin: 0 15px;
+            border-radius: 20px;
             overflow: hidden;
-            border: 4px solid #333;
+            background: #111;
+            box-shadow: 0 0 20px rgba(255,255,255,0.05);
         }
 
         #video {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transform: scaleX(-1); /* Effet miroir */
+            transform: scaleX(-1); /* Effet Miroir */
         }
 
-        /* Galerie de comparaison */
-        .gallery-section {
-            flex: 1;
+        /* Flash lors de la capture */
+        #flash {
+            position: absolute;
+            top:0; left:0; width:100%; height:100%;
+            background: white;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.1s;
+        }
+
+        /* Galerie en bas */
+        .gallery {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: repeat(2, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 10px;
+            padding: 20px 15px;
+            height: 150px;
         }
 
-        .photo-slot {
-            background: #222;
+        .slot {
+            background: var(--grey);
             border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #333;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
-            border: 2px solid transparent;
-            position: relative;
         }
 
-        .photo-slot img {
+        .slot img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        /* Bouton Capture */
-        .controls {
-            padding: 30px;
-            display: flex;
-            justify-content: center;
-            background: rgba(0,0,0,0.5);
+        .active-slot {
+            border-color: var(--red) !important;
         }
 
-        .capture-btn {
-            width: 80px;
-            height: 80px;
+        /* Bouton de commande */
+        .controls {
+            padding-bottom: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .shutter-btn {
+            width: 70px;
+            height: 70px;
             background: white;
             border-radius: 50%;
-            border: 5px solid var(--gavoille-red);
-            cursor: pointer;
-            transition: transform 0.2s;
+            border: 4px solid var(--red);
+            position: relative;
         }
 
-        .capture-btn:active {
-            transform: scale(0.9);
-            background: var(--gavoille-red);
+        .shutter-btn:active {
+            transform: scale(0.95);
+            background: var(--red);
         }
 
-        .instruction {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.6);
-            padding: 10px 20px;
-            border-radius: 20px;
+        .reset-btn {
+            color: #666;
+            text-decoration: underline;
+            font-size: 0.9rem;
+            border: none;
+            background: none;
         }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="logo">GAVOILLE <span style="color:var(--gavoille-red)">Opticiens</span></div>
-</header>
+<header>GAVOILLE <span style="color:var(--red)">OPTICIENS</span></header>
 
-<div class="main-container">
-    <div class="mirror-section">
-        <video id="video" autoplay playsinline></video>
-        <div class="instruction">Comparez vos montures ici</div>
-    </div>
+<div class="mirror-container">
+    <video id="video" autoplay playsinline muted></video>
+    <div id="flash"></div>
+</div>
 
-    <div class="gallery-section" id="gallery">
-        <div class="photo-slot" id="slot-1"></div>
-        <div class="photo-slot" id="slot-2"></div>
-        <div class="photo-slot" id="slot-3"></div>
-        <div class="photo-slot" id="slot-4"></div>
-    </div>
+<div class="gallery">
+    <div class="slot active-slot" id="s1"></div>
+    <div class="slot" id="s2"></div>
+    <div class="slot" id="s3"></div>
+    <div class="slot" id="s4"></div>
 </div>
 
 <div class="controls">
-    <button class="capture-btn" onclick="takeSnapshot()"></button>
+    <button class="shutter-btn" onclick="capture()"></button>
+    <button class="reset-btn" onclick="location.reload()">Réinitialiser le miroir</button>
 </div>
 
 <canvas id="canvas" style="display:none;"></canvas>
@@ -149,39 +149,55 @@
 <script>
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
-    let slotIndex = 1;
+    let currentSlot = 1;
 
-    // Accès à la caméra frontale de l'iPad
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false })
-        .then(stream => {
+    // Lancement de la caméra optimisé pour iOS
+    async function initCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { 
+                    facingMode: "user",
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }, 
+                audio: false 
+            });
             video.srcObject = stream;
-        })
-        .catch(err => {
-            console.error("Erreur caméra: ", err);
-        });
+        } catch (err) {
+            alert("Erreur caméra : Vérifiez les autorisations dans les réglages de l'iPad.");
+        }
+    }
 
-    function takeSnapshot() {
-        const context = canvas.getContext('2d');
+    function capture() {
+        if (currentSlot > 4) return;
+
+        // Effet flash
+        const flash = document.getElementById('flash');
+        flash.style.opacity = 1;
+        setTimeout(() => flash.style.opacity = 0, 100);
+
+        const ctx = canvas.getContext('2d');
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         
-        // Dessiner la vidéo sur le canvas (en inversant pour garder l'effet miroir)
-        context.translate(canvas.width, 0);
-        context.scale(-1, 1);
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        // Dessin de l'image inversée (miroir)
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(video, 0, 0);
 
-        const imageData = canvas.toDataURL('image/png');
-        
-        // Remplir les slots 1 à 4
-        const currentSlot = document.getElementById(`slot-${slotIndex}`);
-        currentSlot.innerHTML = `<img src="${imageData}">`;
-        currentSlot.style.borderColor = "var(--gavoille-red)";
-        
-        slotIndex++;
-        if(slotIndex > 4) slotIndex = 1; // On boucle
+        const data = canvas.toDataURL('image/png');
+        const slot = document.getElementById('s' + currentSlot);
+        slot.innerHTML = `<img src="${data}">`;
+        slot.classList.remove('active-slot');
+
+        currentSlot++;
+        if (currentSlot <= 4) {
+            document.getElementById('s' + currentSlot).classList.add('active-slot');
+        }
     }
+
+    initCamera();
 </script>
 
 </body>
 </html>
-
