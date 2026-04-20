@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>GAVOILLE MIRROR - VIRAL V3</title>
+    <title>GAVOILLE MIRROR - VIRAL V4</title>
     <style>
         :root { --red: #E20613; --black: #1A1A18; --grey: #F8F8F8; }
         
@@ -27,7 +27,7 @@
         .mirror-view { flex: 2.5; position: relative; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #444; }
         #video { 
             width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); 
-            filter: brightness(1.05) contrast(1.1); /* Filtre "Bonne Mine" */
+            filter: brightness(1.05) contrast(1.1);
         }
 
         .side-gallery { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; }
@@ -40,7 +40,6 @@
         .share-btn { 
             background: var(--black); color: white; border: none; padding: 15px 30px; 
             border-radius: 50px; font-weight: bold; font-size: 0.9rem; cursor: pointer; 
-            display: flex; align-items: center; gap: 10px;
         }
         
         #flash { position: absolute; top:0; left:0; width:100%; height:100%; background:white; opacity:0; pointer-events:none; }
@@ -49,10 +48,10 @@
 <body>
 
 <header>
-    <div style="color:var(--black); font-weight:900; letter-spacing:-1px; font-size:1.3rem; line-height:1;">
-        C. et F. GAVOILLE <span style="color:var(--red)">OPTICIENS</span>
+    <div style="color:var(--black); font-weight:900; letter-spacing:2px; font-size:1.6rem; line-height:1;">
+        GAVOILLE OPTICIENS
     </div>
-    <div style="color:#666; font-size:0.6rem; letter-spacing:3px; text-transform:uppercase; margin-top:5px;">Jassans Riottier</div>
+    <div style="color:#666; font-size:0.6rem; letter-spacing:4px; text-transform:uppercase; margin-top:5px;">Jassans Riottier</div>
 </header>
 
 <div class="main-container">
@@ -70,7 +69,7 @@
 
 <div class="controls">
     <button onclick="location.reload()" style="background:none; border:none; color:#999; text-decoration:underline; font-size:0.8rem;">Reset</button>
-    <button class="shutter" id="snapBtn" onclick="capture()"></button>
+    <button class="shutter" onclick="capture()"></button>
     <button class="share-btn" onclick="shareViral()">🚀 PARTAGER MA STORY</button>
 </div>
 
@@ -92,7 +91,6 @@
         canvas.height = video.videoHeight;
         const ctx = canvas.getContext('2d');
         
-        // Filtre de rendu photo
         ctx.filter = 'brightness(1.05) contrast(1.1)';
         ctx.translate(canvas.width, 0); ctx.scale(-1, 1);
         ctx.drawImage(video, 0, 0);
@@ -114,46 +112,40 @@
         const ctx = canvas.getContext('2d');
         canvas.width = 1080; canvas.height = 1920;
 
-        // Design Fond
         ctx.fillStyle = "white"; ctx.fillRect(0,0,1080,1920);
 
-        // Logo & Branding
-        ctx.fillStyle = "#1A1A18"; ctx.font = "bold 65px Montserrat"; ctx.textAlign = "center";
-        ctx.fillText("C. et F. GAVOILLE", 540, 160);
-        ctx.fillStyle = "#E20613"; ctx.fillText("OPTICIENS", 540, 230);
+        // Titre Simplifié sur l'Export
+        ctx.fillStyle = "#1A1A18"; ctx.font = "bold 80px Montserrat"; ctx.textAlign = "center";
+        ctx.fillText("GAVOILLE", 540, 160);
+        ctx.fillStyle = "#E20613"; ctx.fillText("OPTICIENS", 540, 245);
         
-        // Sticker Instagram (Viralité)
-        ctx.fillStyle = "#F4F4F4"; ctx.roundRect(300, 260, 480, 70, 35); ctx.fill();
+        // Sticker Instagram
+        ctx.fillStyle = "#F4F4F4"; ctx.roundRect(300, 280, 480, 70, 35); ctx.fill();
         ctx.fillStyle = "#1A1A18"; ctx.font = "bold 35px Montserrat";
-        ctx.fillText("📸 @gavoille_opticiens_jassans", 540, 308);
+        ctx.fillText("📸 @gavoille_opticiens_jassans", 540, 328);
 
-        // Invitation
         ctx.fillStyle = "#1A1A18"; ctx.font = "italic 45px Georgia";
-        ctx.fillText("Aidez-moi à choisir mes lunettes !", 540, 420);
+        ctx.fillText("Aidez-moi à choisir mes lunettes !", 540, 440);
 
-        // Grille photos
         const w = 480; const h = 640;
-        const pos = [[40, 500], [560, 500], [40, 1170], [560, 1170]];
+        const pos = [[40, 520], [560, 520], [40, 1190], [560, 1190]];
 
         for(let i=0; i<4; i++) {
             if(images[i]) {
                 const img = await new Promise(res => { const o = new Image(); o.onload = () => res(o); o.src = images[i]; });
                 ctx.drawImage(img, pos[i][0], pos[i][1], w, h);
                 ctx.strokeStyle = "#E20613"; ctx.lineWidth = 10; ctx.strokeRect(pos[i][0], pos[i][1], w, h);
-                
-                // Badge de vote
                 ctx.fillStyle = "#E20613"; ctx.fillRect(pos[i][0], pos[i][1], 70, 70);
                 ctx.fillStyle = "white"; ctx.font = "bold 45px Arial"; ctx.fillText(i+1, pos[i][0]+35, pos[i][1]+50);
             }
         }
 
-        // Footer Viral
         ctx.fillStyle = "#1A1A18"; ctx.fillRect(0, 1820, 1080, 100);
         ctx.fillStyle = "white"; ctx.font = "bold 35px Montserrat";
         ctx.fillText("TAGUEZ @GAVOILLE_OPTICIENS_JASSANS EN STORY !", 540, 1885);
 
         canvas.toBlob(async (blob) => {
-            const file = new File([blob], "mon-choix-gavoille.jpg", { type: "image/jpeg" });
+            const file = new File([blob], "choix-gavoille.jpg", { type: "image/jpeg" });
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 await navigator.share({ files: [file], title: 'Gavoille Opticiens' });
             } else {
@@ -162,7 +154,6 @@
         }, 'image/jpeg');
     }
 
-    // Helper roundRect pour les versions plus anciennes de navigateurs
     if (!CanvasRenderingContext2D.prototype.roundRect) {
         CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
             if (w < 2 * r) r = w / 2; if (h < 2 * r) r = h / 2;
