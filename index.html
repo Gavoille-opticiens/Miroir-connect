@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>GAVOILLE - LOOK BOOK</title>
+    <title>GAVOILLE - LOOK BOOK PREMIUM</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --red: #E20613; --black: #1A1A18; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; background: var(--black); color: white; font-family: 'Montserrat', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: fixed; width: 100%; }
         
-        header { padding-top: env(safe-area-inset-top); background: white; text-align: center; border-bottom: 3px solid var(--red); flex-shrink: 0; }
+        header { padding-top: env(safe-area-inset-top); background: white; text-align: center; border-bottom: 3px solid var(--red); flex-shrink: 0; z-index: 10; }
         .gavoille-logo-square { display: inline-flex; background: var(--red); color: white; width: 70px; height: 70px; border: 2px solid #000; margin: 10px 0; flex-direction: column; justify-content: center; align-items: center; }
         .logo-text-main { font-size: 0.7rem; font-weight: 900; line-height: 1; }
         .logo-text-sub { font-size: 0.5rem; padding-left: 8px; }
@@ -24,17 +24,42 @@
         }
         
         .mirror-view { flex: 2.5; position: relative; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #333; }
-        #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); background: #000; }
+        
+        /* Application du filtre Bonne Mine (Chaleur + Contraste doux) */
+        #video { 
+            width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); background: #000; 
+            filter: sepia(0.15) saturate(1.1) contrast(1.05) brightness(1.02); 
+        }
+
+        /* Zone du Décompte */
+        #countdown-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.2); z-index: 20; opacity: 0; pointer-events: none;
+            transition: opacity 0.2s;
+        }
+        #countdown-text {
+            font-size: 150px; font-weight: 900; color: white;
+            text-shadow: 0 0 20px rgba(0,0,0,0.8);
+            transform: scale(0.5); transition: transform 0.2s;
+        }
+        #countdown-overlay.show { opacity: 1; }
+        #countdown-overlay.show #countdown-text { transform: scale(1); }
 
         .side-gallery { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; }
         .slot { background: #222; border-radius: 12px; border: 2px solid transparent; overflow: hidden; aspect-ratio: 3/4; }
         .slot img { width: 100%; height: 100%; object-fit: cover; }
         .slot.active { border-color: var(--red); box-shadow: 0 0 15px rgba(226, 6, 19, 0.5); }
 
-        .floating-controls { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: 90%; max-width: 450px; background: rgba(255, 255, 255, 0.95); padding: 15px; border-radius: 50px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 999; }
-        .shutter { width: 70px; height: 70px; background: var(--red); border-radius: 50%; border: 5px solid white; cursor: pointer; }
+        .floating-controls { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: 90%; max-width: 450px; background: rgba(255, 255, 255, 0.95); padding: 15px; border-radius: 50px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 999; backdrop-filter: blur(5px); }
+        .shutter { width: 70px; height: 70px; background: var(--red); border-radius: 50%; border: 5px solid white; cursor: pointer; transition: transform 0.1s; }
+        .shutter:active { transform: scale(0.9); }
+        .shutter.counting { background: #555; border-color: #888; pointer-events: none; animation: pulse 1s infinite; }
+        
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
         .btn-ui { background: var(--black); color: white; border: none; padding: 12px 20px; border-radius: 30px; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
-        #flash { position: absolute; top:0; left:0; width:100%; height:100%; background:white; opacity:0; pointer-events:none; z-index: 10; }
+        #flash { position: absolute; top:0; left:0; width:100%; height:100%; background:white; opacity:0; pointer-events:none; z-index: 30; }
         canvas { display: none; }
     </style>
 </head>
@@ -47,6 +72,9 @@
 <div class="main-container">
     <div class="mirror-view">
         <video id="video" autoplay playsinline muted></video>
+        <div id="countdown-overlay">
+            <div id="countdown-text"></div>
+        </div>
         <div id="flash"></div>
     </div>
     <div class="side-gallery">
@@ -59,7 +87,7 @@
 
 <div class="floating-controls">
     <button class="btn-ui" style="background:none; color:#666; text-decoration:underline;" onclick="location.reload()">Reset</button>
-    <button class="shutter" onclick="capture()"></button>
+    <button class="shutter" id="shutterBtn" onclick="startCaptureSequence()"></button>
     <button class="btn-ui" onclick="shareFinal()">PARTAGER</button>
 </div>
 
@@ -67,10 +95,13 @@
 
 <script>
     const video = document.getElementById('video');
+    const shutterBtn = document.getElementById('shutterBtn');
+    const countdownOverlay = document.getElementById('countdown-overlay');
+    const countdownText = document.getElementById('countdown-text');
     let currentSlot = 1;
     let imagesData = [null, null, null, null];
+    let isCounting = false;
 
-    // Utilisation de paramètres simples pour éviter les bugs d'affichage
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
     .then(stream => { 
         video.srcObject = stream;
@@ -78,21 +109,42 @@
     })
     .catch(err => alert("Erreur caméra : " + err));
 
-    function capture() {
+    // Fonction principale qui lance le décompte avant la capture
+    function startCaptureSequence() {
+        if (isCounting) return; // Évite les doubles clics
+        isCounting = true;
+        shutterBtn.classList.add('counting');
+        runCountdown(3); // Lance le décompte à partir de 3
+    }
+
+    function runCountdown(count) {
+        countdownOverlay.classList.add('show');
+        countdownText.innerText = count;
+
+        if (count > 0) {
+            setTimeout(() => runCountdown(count - 1), 1000); // Décompte chaque seconde
+        } else {
+            // Arrivé à 0, on capture
+            countdownOverlay.classList.remove('show');
+            performCapture();
+            isCounting = false;
+            shutterBtn.classList.remove('counting');
+        }
+    }
+
+    function performCapture() {
         const flash = document.getElementById('flash');
         flash.style.opacity = 1; setTimeout(() => flash.style.opacity = 0, 100);
 
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         
-        // Ratio 3:4 portrait
         canvas.width = 600;
         canvas.height = 800;
 
         const vW = video.videoWidth;
         const vH = video.videoHeight;
         
-        // Calcul du crop central
         let sW, sH, sX, sY;
         const targetRatio = 600 / 800;
         const currentRatio = vW / vH;
@@ -106,6 +158,10 @@
         }
 
         ctx.translate(600, 0); ctx.scale(-1, 1);
+        
+        // Application du filtre Bonne Mine sur la capture finale
+        ctx.filter = 'sepia(0.12) saturate(1.08) contrast(1.04) brightness(1.02)';
+        
         ctx.drawImage(video, sX, sY, sW, sH, 0, 0, 600, 800);
         
         const data = canvas.toDataURL('image/jpeg', 0.9);
@@ -125,7 +181,6 @@
 
         ctx.fillStyle = "white"; ctx.fillRect(0,0,1080,1920);
 
-        // Logo
         ctx.fillStyle = "#E20613"; ctx.fillRect(430, 80, 220, 220);
         ctx.strokeStyle = "black"; ctx.lineWidth = 4; ctx.strokeRect(428, 78, 224, 224);
         ctx.fillStyle = "white"; ctx.textAlign = "center";
