@@ -161,12 +161,12 @@
 
         ctx.fillStyle = "#E20613"; ctx.font = "bold 50px Montserrat"; ctx.fillText("VOTE EN RÉPONDANT ICI ! 👇", 540, 1820);
         ctx.fillStyle = "#1A1A18"; ctx.fillRect(0, 1860, 1080, 60);
-        ctx.fillStyle = "white"; ctx.font = "bold 25px Montserrat"; ctx.fillText("TAGUEZ @GAVOILLE_OPTICIENS_JASSANS", 540, 1900);
+        ctx.fillStyle = "white"; ctx.font = "bold 25px Montserrat"; ctx.fillText("TAGUEZ @GAVOILLE_OPTICIENS", 540, 1900);
 
         try {
             canvas.toBlob(async (blob) => {
                 const file = new File([blob], "lookbook-gavoille.jpg", { type: "image/jpeg" });
-                const shareText = "Aidez-moi à choisir mes nouvelles lunettes chez Gavoille Opticiens ! 👓✨\n\n#GavoilleOpticiens #JassansRiottier #OpticienJassans #LookBook #NouvellesLunettes";
+                const shareText = "Aidez-moi à choisir mes nouvelles lunettes chez Gavoille Opticiens ! 👓✨\n\n#GavoilleOpticiens #JassansRiottier #Gleize #BellevilleEnBeaujolais #Reyrieux #Mionnay #VillarsLesDombes #StDidierSurChalaronne #Opticien #LookBook";
                 
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     await navigator.share({
