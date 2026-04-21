@@ -163,25 +163,26 @@
         ctx.fillStyle = "#1A1A18"; ctx.fillRect(0, 1860, 1080, 60);
         ctx.fillStyle = "white"; ctx.font = "bold 25px Montserrat"; ctx.fillText("TAGUEZ @GAVOILLE_OPTICIENS_JASSANS", 540, 1900);
 
-        // Méthode de partage sécurisée
         try {
             canvas.toBlob(async (blob) => {
                 const file = new File([blob], "lookbook-gavoille.jpg", { type: "image/jpeg" });
+                const shareText = "Aidez-moi à choisir mes nouvelles lunettes chez Gavoille Opticiens ! 👓✨\n\n#GavoilleOpticiens #JassansRiottier #OpticienJassans #LookBook #NouvellesLunettes";
+                
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     await navigator.share({
                         files: [file],
                         title: 'Mon Look Gavoille',
+                        text: shareText
                     });
                 } else {
-                    const dataUrl = canvas.toDataURL("image/jpeg");
                     const link = document.createElement('a');
                     link.download = 'lookbook-gavoille.jpg';
-                    link.href = dataUrl;
+                    link.href = canvas.toDataURL("image/jpeg");
                     link.click();
                 }
             }, 'image/jpeg', 0.9);
         } catch (err) {
-            alert("Utilisez le bouton de téléchargement de votre navigateur");
+            alert("Erreur lors du partage.");
         }
     }
 </script>
